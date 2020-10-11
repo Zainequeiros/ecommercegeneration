@@ -32,22 +32,20 @@ public class EcommerceGeneration {
 
 	public static void main(String[] args)throws InterruptedException {
 	
-		//cadastro login
-		char opcaoEntrar, opcaoCadastro = ' ';
+		char opcaoCadastro = ' ';
+		int opcaoEntrada;
 	
 		mensagemEntrada();
 		Thread.sleep(5000);
-
+		
 		do {
 			limpaTela();
 
-			System.out.print("Voc� deseja fazer L - Login, C - Cadastro ou S - Sair? ");
-			opcaoEntrar = leia.next().toUpperCase().charAt(0);
+			opcaoEntrada = menuPrincipal(); //1 - Cadastro / 2 - Login / 3 - Sair
 
-			switch (opcaoEntrar) {
-			case 'C': {
+			if (opcaoEntrada == 1) {
 				
-				System.out.print("\nA op��o escolhida foi: " + opcaoEntrar + " - Cadastro!");
+				System.out.print("\nA op��o escolhida foi: " + opcaoEntrada + " - Cadastro!");
 				Thread.sleep(3500);
 				limpaTela();
 				
@@ -62,9 +60,6 @@ public class EcommerceGeneration {
 					}
 
 				} while(opcaoCadastro != 'N' && contadorNovoUsuario < LIMITE_USUARIOS);
-				
-			}
-			case 'L':{
 
 				System.out.print("\nVoc� ser� direcionade para o Login da aplica��o");
 				Thread.sleep(3500);
@@ -74,18 +69,22 @@ public class EcommerceGeneration {
 				nomeUsuario = leia.next();
 				
 				logaUsuario(nomeUsuario);
+				Thread.sleep(2000);
+			} else if (opcaoEntrada == 2) {
 
-				break;
-			}
-			case 'S': {
+				System.out.print("Digite seu nome de usu�rio: ");
+				nomeUsuario = leia.next();
+				
+				logaUsuario(nomeUsuario);
+				Thread.sleep(2000);
+			} else if (opcaoEntrada == 3) {
 				System.out.println("Encerrando E-commerce...");
 				break;
-			}
-			default:
-				System.out.print("Op��o inv�lida. Digite L para Login ou C para Cadastro: ");
+			} else {
+				System.out.println("Op��o inv�lida!");
 			}
 
-		} while (opcaoEntrar != 'L' && opcaoEntrar != 'C' && opcaoEntrar != 'S');
+		} while (true);
 		
 		leia.close();
 	}
@@ -120,12 +119,21 @@ public class EcommerceGeneration {
 	}
 	
 	public static void limpaTela() {
-		for(int x = 0;x < 50;x++) {
-		System.out.println();
-		}
+		for (int x = 0; x < 50; x++) System.out.println();
 	}
 	
-	// Procura nome do usuário no cadastro, se encontrar retorna seu índice, senão retorna -1
+	public static int menuPrincipal() {
+
+		System.out.println("O que deseja fazer?");
+		System.out.println("1 - Cadastro");
+		System.out.println("2 - Login");
+		System.out.println("3 - Sair");
+		System.out.print("Opção: ");
+
+		return leia.nextInt();
+	}
+
+	//Procura nome do usuário no cadastro, se encontrar retorna seu índice, senão retorna -1
 	public static int procuraCadastro(String usuario) {
 		
 		for (int i = 0; i < contadorNovoUsuario; i++) {
@@ -174,13 +182,11 @@ public class EcommerceGeneration {
 	}
 	
 	public static void imprimiDadosCadastrais() {
+		
 		System.out.println("\nDados Cadastrados: ");
-		
-		System.out.printf("\nO Nome de usu�rio �: %s",nomeUsuarios[contadorNovoUsuario]);
-		
-		System.out.printf("\nA senha cadastrada foi: %s",senhaUsuarios[contadorNovoUsuario]);
-		
-		System.out.printf("\nO sexo do usu�rio %s �: %s",nomeUsuarios[contadorNovoUsuario],sexoUsuarios[contadorNovoUsuario]);
+		System.out.printf("\nO Nome de usu�rio �: %s", nomeUsuarios[contadorNovoUsuario]);
+		System.out.printf("\nA senha cadastrada foi: %s", senhaUsuarios[contadorNovoUsuario]);
+		System.out.printf("\nO sexo do usu�rio %s �: %s", nomeUsuarios[contadorNovoUsuario], sexoUsuarios[contadorNovoUsuario]);
 	}
 	
 	public static char cadastrarOutroUsuario() {
@@ -267,7 +273,13 @@ public class EcommerceGeneration {
 				codigoProduto = leia.nextInt();
 				
 				if (codigoValido(codigoProduto)) {
-					adicionaProduto(codigoProduto);
+					
+					if (procuraProduto(codigoProduto) >= 0) {
+						alteraProduto(codigoProduto);
+					} else {
+						adicionaProduto(codigoProduto);
+					}
+
 				} else {
 					System.out.println("Código de produto inválido");
 				}
@@ -296,9 +308,14 @@ public class EcommerceGeneration {
 			
 			} else if (opcaoCatalogo == 4) {
 				
-				if (finalizaCompra()) {
-					break;
+				if (contadorNovoProduto != 0) {
+					if (finalizaCompra()) {
+						break;
+					}
+				} else {
+					System.out.println("Coloque pelo menos 1 produto no carrinho para finalizar a compra");
 				}
+
 			
 			} else if (opcaoCatalogo == 5) {
 				
@@ -352,16 +369,12 @@ public class EcommerceGeneration {
 	public static int menuCompra() {
 		
 		System.out.println("\nMENU\n");
-			
-		System.out.println("Adicionar ao carrinho - Op��o 1");
-		
-		System.out.println("Remover item do carrinho - Op��o 2");
-		
-		System.out.println("Editar compra - Op��o 3");
-		
-		System.out.println("Finalizar compra - Op��o 4");
-		
-		System.out.println("Cancelar compra - Op��o 5");
+		System.out.println("1 - Adicionar ao carrinho");
+		System.out.println("2 - Remover item do carrinho");
+		System.out.println("3 - Editar compra");
+		System.out.println("4 - Finalizar compra");
+		System.out.println("5 - Cancelar compra");
+		System.out.print("Opção: ");
 		
 		return leia.nextInt();
 	}
@@ -388,8 +401,10 @@ public class EcommerceGeneration {
 				} else if (quantidadeProduto <= 0) {
 					System.out.println("Quantidade inválida! Tente novamente");
 				} else {
-	
+
 					System.out.println("Adicionando ao carrinho...");
+					imprimiPersonagem(codigoProduto);
+
 					carrinhoCodigo[contadorNovoProduto] = codigoProduto;
 					carrinhoQuantidade[contadorNovoProduto] = quantidadeProduto;
 					
@@ -566,5 +581,121 @@ public class EcommerceGeneration {
 		for(int i = 0; i < contadorNovoProduto; i++) {
 			estoque[carrinhoCodigo[i]-1] = estoque[carrinhoCodigo[i]-1] - carrinhoQuantidade[i];
 		}
+	}
+
+	// Easter Eggs
+	public static void imprimiPersonagem(int codigoProduto) {
+		
+		switch (codigoProduto) {
+			case 1:
+				imprimiWoody();
+				break;
+			case 2:
+				imprimiBuzz();
+				break;
+			case 5:
+				imprimiAlien();
+				break;
+			default:
+				return;
+		}
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	public static void imprimiWoody() {	
+		System.out.println("             .-'\"\"\"'-.");
+		System.out.println("        ,____|_______|____,");
+		System.out.println("         '._____________.'");
+		System.out.println("             |.-- --.|");
+		System.out.println("             |(o) (o)|");
+		System.out.println("            (|       |)");
+		System.out.println("             |   U   |");
+		System.out.println("   __        | .___. |");
+		System.out.println("  /|||       |       |");
+		System.out.println("  ||||       :       :");
+		System.out.println("  |  |/)      `.___.'");
+		System.out.println("   \\  /       __) (__");
+		System.out.println("    \\/\\      /\\ \\ / /\\");
+		System.out.println("     \\ \\    /\\ \\ ^ / /\\");
+		System.out.println("      \\ \\  / |  |0_/\\_ \\");
+		System.out.println("       \\ \\/ /|  | \\  /\\ \\");
+		System.out.println("        \\  / |  |0//\\\\ \\ \\");
+		System.out.println("         \\/  | /   \\ |  \\ \\");
+		System.out.println("             |/ .-. \\|  / /");
+		System.out.println("          .-'|-( ~ )-| / /");
+		System.out.println("          \\  |--`-'--|/ /");
+		System.out.println("           \\ |       | /");
+		System.out.println("            \\|   |   |/");
+		System.out.println("             |   |   |");
+		System.out.println("             |   |   |");
+		System.out.println("             |   |   |");
+		System.out.println("             |   |   |");
+		System.out.println("             |   |   |");
+		System.out.println("             |___|___|");
+		System.out.println("            `|---|---|'");
+		System.out.println("            *|   |   |*");
+		System.out.println("             |_._|_._|");
+		System.out.println("            /'  /|\\  '\\");
+		System.out.println("           /   /^ ^\\   \\");
+		System.out.println("          /__.'     `.__\\");
+	}
+	
+	public static void imprimiBuzz() {
+		System.out.println("            _._                           _._");
+		System.out.println("           ||||                           ||||");
+		System.out.println("           ||||_           ___           _||||");
+		System.out.println("           |  ||        .-'___`-.        ||  |");
+		System.out.println("           \\   /      .' .'_ _'. '.      \\   /");
+		System.out.println("           /~~|       | (| b d |) |       |~~\\");
+		System.out.println("          /'  |       |  |  '  |  |       |  `\\");
+		System.out.println(",        /__.-:      ,|  | `-' |  |,      :-.__\\       ,");
+		System.out.println("|'-------(    \\-''\"\"/.|  /\\___/\\  |.\\\"\"''-/    )------'|");
+		System.out.println("|         \\_.-'\\   /   '-._____.-'   \\   /'-._/        |");
+		System.out.println("|.---------\\   /'._| _    .---. ===  |_.'\\   /--------.|");
+		System.out.println("'           \\ /  | |\\_\\ _ \\=v=/  _   | |  \\ /          '");
+		System.out.println("             `.  | | \\_\\_\\ ~~~  (_)  | |  .'");
+		System.out.println("               `'\"'|`'--.__.^.__.--'`|'\"'`");
+		System.out.println("                   \\                 /");
+		System.out.println("                    `,..---'\"'---..,'");
+		System.out.println("                      :--..___..--:");
+		System.out.println("                       \\         /");
+		System.out.println("                       |`.     .'|");
+		System.out.println("                       |  :___:  |");
+		System.out.println("                       |   | |   |");
+		System.out.println("                       |   | |   |");
+		System.out.println("                       |.-.| |.-.|");
+		System.out.println("                       |`-'| |`-'|");
+		System.out.println("                       |   | |   |");
+		System.out.println("                      /    | |    \\");
+		System.out.println("                     |_____| |_____|");
+		System.out.println("                     ':---:-'-:---:'");
+		System.out.println("                     /    |   |    \\");
+		System.out.println("                    /.---.|   |.---.\\");
+		System.out.println("                    `.____;   :____.'");
+	}
+
+	public static void imprimiAlien() {
+		System.out.println("                   ()");
+		System.out.println("                 __/\\__");
+		System.out.println("        |\\   .-\"`      `\"-.   /|");
+		System.out.println("        | \\.'( ') (' ) (. )`./ |");
+		System.out.println("         \\_                  _/");
+		System.out.println("           \\  `~\"'=::='\"~`  /");
+		System.out.println("    ,       `-.__      __.-'       ,");
+		System.out.println(".---'\\________( `\"\"~~\"\"` )________/'---.");
+		System.out.println(" >   )       / `\"\"~~~~\"\"` \\       (   <");
+		System.out.println("'----`--..__/        -(-)- \\__..--`----'");
+		System.out.println("            |_____ __ _____|");
+		System.out.println("            [_____[##]_____]");
+		System.out.println("            |              |");
+		System.out.println("            \\      ||      /");
+		System.out.println("             \\     ||     /");
+		System.out.println("          .-\"~`--._||_.--'~\"-.");
+		System.out.println("         (_____,.--\"\"--.,_____)");		
 	}
 }
