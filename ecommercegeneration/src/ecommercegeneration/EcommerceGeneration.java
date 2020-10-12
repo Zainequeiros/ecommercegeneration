@@ -633,8 +633,23 @@ public class EcommerceGeneration {
 			
 			int indice = indiceUsuario * QUANTIDADE_PRODUTOS; //Iniciar no carrinho do usuário - Matriz linear
 			for (int i = 0; i < contadorNovoProduto; i++, indice++) {
-				carrinhoCodigo[i] = carrinhoCodigoUsuarios[indice];
-				carrinhoQuantidade[i] = carrinhoQuantidadeUsuarios[indice];
+
+				if (carrinhoQuantidadeUsuarios[indice] > estoque[carrinhoCodigoUsuarios[indice] - 1]) {
+					
+					carrinhoCodigo[i] = carrinhoCodigoUsuarios[indice];
+					carrinhoQuantidade[i] = estoque[carrinhoCodigoUsuarios[indice] - 1];
+
+				} else {
+					
+					carrinhoCodigo[i] = carrinhoCodigoUsuarios[indice];
+					carrinhoQuantidade[i] = carrinhoQuantidadeUsuarios[indice];
+				}
+			}
+
+			for (int i = 0; i < contadorNovoProduto; i++) {
+				if (carrinhoQuantidade[i] == 0) {
+					removeProduto(carrinhoCodigo[i]);
+				}
 			}
 
 		} else {
