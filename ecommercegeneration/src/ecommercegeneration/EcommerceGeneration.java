@@ -15,20 +15,27 @@ public class EcommerceGeneration {
 	public static final int QUANTIDADE_PRODUTOS = 14;
 
 	//Cadastro
-	public static final int LIMITE_USUARIOS = 3;
+	public static final int LIMITE_USUARIOS = 50;
 	public static String nomeUsuarios[] = new String[LIMITE_USUARIOS];
 	public static String senhaUsuarios[] = new String[LIMITE_USUARIOS];
 	public static char sexoUsuarios[] = new char[LIMITE_USUARIOS];
+	public static int carrinhoCodigoUsuarios[] = new int[LIMITE_USUARIOS * QUANTIDADE_PRODUTOS];
+	public static int carrinhoQuantidadeUsuarios[] = new int[LIMITE_USUARIOS * QUANTIDADE_PRODUTOS];
+	public static int contadorNovoProdutoUsuarios[] = new int[LIMITE_USUARIOS];
+	public static int historicoComprasUsuarios[] = new int[LIMITE_USUARIOS * QUANTIDADE_PRODUTOS];
 	public static int contadorNovoUsuario = 0;
 	public static String senhaUsuario;
 	
 	//Carrinho - Área de compras - Finalização
 	public static int carrinhoQuantidade[] = new int [QUANTIDADE_PRODUTOS];
 	public static int carrinhoCodigo[] = new int [QUANTIDADE_PRODUTOS];
+	public static int indiceProdutosMaisComprados[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+	public static int quantidadeProdutosMaisComprados[] = new int[QUANTIDADE_PRODUTOS];
 	public static int contadorNovoProduto;
 	public static double somaCarrinho;
-	public static String nomeUsuario = " ";
+	public static String nomeUsuario;
 	public static char sexoUsuario;
+	public static int indiceUsuario;
 
 	public static void main(String[] args)throws InterruptedException {
 	
@@ -206,17 +213,17 @@ public class EcommerceGeneration {
 
 	public static void logaUsuario(String usuario) {
 		
-		int indiceUsuario;
+		int indice;
 
-		indiceUsuario = procuraCadastro(usuario);
+		indice = procuraCadastro(usuario);
 
-		if (indiceUsuario >= 0) {
+		if (indice >= 0) {
 			
-			if (senhaValida(indiceUsuario, usuario)) {
+			if (senhaValida(indice, usuario)) {
 
 				nomeUsuario = usuario;
-				sexoUsuario = sexoUsuarios[indiceUsuario];
-
+				sexoUsuario = sexoUsuarios[indice];
+				indiceUsuario = indice;
 				System.out.printf("\nSeja Bem-Vinde %s!", nomeUsuario);
 				iniciaCompra();
 			
@@ -253,9 +260,7 @@ public class EcommerceGeneration {
 
 	public static void iniciaCompra() {
 		
-		//Inicializa carrinho
-		contadorNovoProduto = 0;
-		somaCarrinho = 0;
+		inicializaCarrinho();
 		
 		int codigoProduto, opcaoCatalogo;
 
@@ -319,11 +324,14 @@ public class EcommerceGeneration {
 			
 			} else if (opcaoCatalogo == 5) {
 				
-				System.out.println("Deseja mesmo cancelar? S - Sim ou N - N�o : ");
+				System.out.print("Deseja mesmo sair? S - Sim ou N - N�o : ");
 				char cancelar = leia.next().toUpperCase().charAt(0);
 				
 				if(cancelar == 'S') {
-					System.out.println("\nVoc� cancelou a compra ");
+					
+					salvaCarrinho();
+					
+					System.out.println("\nVolte sempre!");
 					contadorNovoProduto = 0;
 					break;
 				}
@@ -341,8 +349,10 @@ public class EcommerceGeneration {
 				
 		System.out.println("\n\nLISTA DE PRODUTOS\n");
 	
-		for (int x = 0; x < QUANTIDADE_PRODUTOS; x++) {
-			System.out.printf("C�digo: %d\t Em estoque: %d\t Valor: R$ %.2f\t %s\n", codigoProdutos[x], estoque[x], valorProdutos[x], produtos[x]);	
+		int aux;
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+			aux = indiceProdutosMaisComprados[i]; 
+			System.out.printf("C�digo: %d\t Em estoque: %d\t Valor: R$ %.2f\t %s\n", codigoProdutos[aux], estoque[aux], valorProdutos[aux], produtos[aux]);	
 		}
 		
 	}
@@ -373,7 +383,7 @@ public class EcommerceGeneration {
 		System.out.println("2 - Remover item do carrinho");
 		System.out.println("3 - Editar compra");
 		System.out.println("4 - Finalizar compra");
-		System.out.println("5 - Cancelar compra");
+		System.out.println("5 - Sair da minha conta");
 		System.out.print("Opção: ");
 		
 		return leia.nextInt();
@@ -491,6 +501,10 @@ public class EcommerceGeneration {
 
 			atualizaEstoque();
 
+			atualizaListaMaisComprados();
+
+			contadorNovoProdutoUsuarios[indiceUsuario] = 0;
+
 			System.out.println("Agradecemos a sua visita! E n�o esque�a: Amigue estou aqui!");
 			return true;
 		
@@ -500,6 +514,7 @@ public class EcommerceGeneration {
 			return false;
 		} else {
 		
+			salvaCarrinho();
 			System.out.println("Agradecemos a sua visita! E n�o esque�a: Amigue estou aqui!");
 			return true;
 		}
@@ -581,6 +596,72 @@ public class EcommerceGeneration {
 		for(int i = 0; i < contadorNovoProduto; i++) {
 			estoque[carrinhoCodigo[i]-1] = estoque[carrinhoCodigo[i]-1] - carrinhoQuantidade[i];
 		}
+	}
+
+	public static void atualizaListaMaisComprados() {
+		
+		for (int i = 0; i < contadorNovoProduto; i++) {
+			quantidadeProdutosMaisComprados[carrinhoCodigo[i] - 1] += carrinhoQuantidade[i];
+		}
+		
+		int listaAuxiliar[] = new int[QUANTIDADE_PRODUTOS];
+
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+			listaAuxiliar[i] = quantidadeProdutosMaisComprados[i];
+		}
+
+		int indiceMaisVendido;
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+
+			indiceMaisVendido = 0;
+			for (int j = 0; j < QUANTIDADE_PRODUTOS; j++) {
+				if (listaAuxiliar[indiceMaisVendido] < listaAuxiliar[j]) {
+					indiceMaisVendido = j;
+				}
+			}
+			listaAuxiliar[indiceMaisVendido] = -1; //"Excluindo" item do lista para ele não ser mais vendido que zero
+			indiceProdutosMaisComprados[i] = indiceMaisVendido;
+		}
+
+	}
+
+	public static void inicializaCarrinho() {
+		
+		if (contadorNovoProdutoUsuarios[indiceUsuario] > 0) {
+			
+			contadorNovoProduto = contadorNovoProdutoUsuarios[indiceUsuario];
+			
+			int indice = indiceUsuario * QUANTIDADE_PRODUTOS; //Iniciar no carrinho do usuário - Matriz linear
+			for (int i = 0; i < contadorNovoProduto; i++, indice++) {
+				carrinhoCodigo[i] = carrinhoCodigoUsuarios[indice];
+				carrinhoQuantidade[i] = carrinhoQuantidadeUsuarios[indice];
+			}
+
+		} else {
+			contadorNovoProduto = 0;
+		}
+	}
+
+	public static void salvaCarrinho() {
+
+		System.out.print("Deseja salvar este carrinho? S - Sim ou N - Não: ");
+		char salvar = leia.next().toUpperCase().charAt(0);
+
+		if (salvar == 'S') {
+
+			contadorNovoProdutoUsuarios[indiceUsuario] = contadorNovoProduto;
+			
+			int indice = indiceUsuario * QUANTIDADE_PRODUTOS; //Iniciar no carrinho do usuário - Matriz linear
+			for (int i = 0; i < contadorNovoProduto; i++, indice++) {
+				carrinhoCodigoUsuarios[indice] = carrinhoCodigo[i];
+				carrinhoQuantidadeUsuarios[indice] = carrinhoQuantidade[i];
+			}
+			
+			System.out.println("Seu carrinho foi salvo");
+		} else {
+			contadorNovoProdutoUsuarios[indiceUsuario] = 0;
+		}
+
 	}
 
 	// Easter Eggs
