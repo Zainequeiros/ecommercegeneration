@@ -15,20 +15,28 @@ public class EcommerceGeneration {
 	public static final int QUANTIDADE_PRODUTOS = 14;
 
 	//Cadastro
-	public static final int LIMITE_USUARIOS = 3;
+	public static final int LIMITE_USUARIOS = 50;
 	public static String nomeUsuarios[] = new String[LIMITE_USUARIOS];
 	public static String senhaUsuarios[] = new String[LIMITE_USUARIOS];
 	public static char sexoUsuarios[] = new char[LIMITE_USUARIOS];
+	public static int carrinhoCodigoUsuarios[] = new int[LIMITE_USUARIOS * QUANTIDADE_PRODUTOS];
+	public static int carrinhoQuantidadeUsuarios[] = new int[LIMITE_USUARIOS * QUANTIDADE_PRODUTOS];
+	public static int contadorNovoProdutoUsuarios[] = new int[LIMITE_USUARIOS];
+	public static int historicoComprasUsuarios[] = new int[LIMITE_USUARIOS * QUANTIDADE_PRODUTOS];
 	public static int contadorNovoUsuario = 0;
 	public static String senhaUsuario;
 	
 	//Carrinho - Área de compras - Finalização
 	public static int carrinhoQuantidade[] = new int [QUANTIDADE_PRODUTOS];
 	public static int carrinhoCodigo[] = new int [QUANTIDADE_PRODUTOS];
+	public static int indiceProdutosMaisComprados[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+	public static int quantidadeProdutosMaisComprados[] = new int[QUANTIDADE_PRODUTOS];
 	public static int contadorNovoProduto;
 	public static double somaCarrinho;
-	public static String nomeUsuario = " ";
+	public static String nomeUsuario;
 	public static char sexoUsuario;
+	public static int indiceUsuario;
+	public static int sugestaoCompraram, sugestaoTambemCompraram;
 
 	public static void main(String[] args)throws InterruptedException {
 	
@@ -45,7 +53,7 @@ public class EcommerceGeneration {
 
 			if (opcaoEntrada == 1) {
 				
-				System.out.print("\nA op��o escolhida foi: " + opcaoEntrada + " - Cadastro!");
+				System.out.print("\nA opção escolhida foi: " + opcaoEntrada + " - Cadastro!");
 				Thread.sleep(3500);
 				limpaTela();
 				
@@ -55,17 +63,17 @@ public class EcommerceGeneration {
 					
 					if (contadorNovoUsuario < LIMITE_USUARIOS) {
 
-						System.out.print("\n\nDeseja cadastrar outra pessoa?\nOp��es (Sim/N�o)");
+						System.out.print("\n\nDeseja cadastrar outra pessoa?\nOpções (Sim/Não)");
 						opcaoCadastro = cadastrarOutroUsuario(); //S ou N
 					}
 
 				} while(opcaoCadastro != 'N' && contadorNovoUsuario < LIMITE_USUARIOS);
 
-				System.out.print("\nVoc� ser� direcionade para o Login da aplica��o");
+				System.out.print("\nVocê será direcionade para o Login da aplicação");
 				Thread.sleep(3500);
 				limpaTela();
 			
-				System.out.print("Digite seu nome de usu�rio: ");
+				System.out.print("Digite seu nome de usuário: ");
 				nomeUsuario = leia.next();
 				
 				logaUsuario(nomeUsuario);
@@ -81,7 +89,7 @@ public class EcommerceGeneration {
 				System.out.println("Encerrando E-commerce...");
 				break;
 			} else {
-				System.out.println("Op��o inv�lida!");
+				System.out.println("Opção inválida!");
 			}
 
 		} while (true);
@@ -152,7 +160,7 @@ public class EcommerceGeneration {
 		if (contadorNovoUsuario < LIMITE_USUARIOS) {
 		
 			do {
-				System.out.printf("Digite o seu nome de usu�rio: ");
+				System.out.printf("Digite o seu nome de usuário: ");
 				nomeUsuario = leia.next();
 				indiceUsuario = procuraCadastro(nomeUsuario);
 				
@@ -164,10 +172,10 @@ public class EcommerceGeneration {
 				}
 			} while (true);
 			
-			System.out.printf("Digite a sua senha de usu�rio: ");
+			System.out.printf("Digite a sua senha de usuário: ");
 			senhaUsuarios[contadorNovoUsuario] = leia.next();
 			
-			System.out.printf("Digite o seu sexo \nM - Masculino \nF - Feminino \nOutra letra, � sua escolha, que melhor te represente!): ");
+			System.out.printf("Digite o seu sexo \nM - Masculino \nF - Feminino \nOutra letra, é sua escolha, que melhor te represente!): ");
 			sexoUsuarios[contadorNovoUsuario] = leia.next().toUpperCase().charAt(0);
 
 			limpaTela();
@@ -184,9 +192,9 @@ public class EcommerceGeneration {
 	public static void imprimiDadosCadastrais() {
 		
 		System.out.println("\nDados Cadastrados: ");
-		System.out.printf("\nO Nome de usu�rio �: %s", nomeUsuarios[contadorNovoUsuario]);
+		System.out.printf("\nO Nome de usuário é: %s", nomeUsuarios[contadorNovoUsuario]);
 		System.out.printf("\nA senha cadastrada foi: %s", senhaUsuarios[contadorNovoUsuario]);
-		System.out.printf("\nO sexo do usu�rio %s �: %s", nomeUsuarios[contadorNovoUsuario], sexoUsuarios[contadorNovoUsuario]);
+		System.out.printf("\nO sexo do usuário %s é: %s", nomeUsuarios[contadorNovoUsuario], sexoUsuarios[contadorNovoUsuario]);
 	}
 	
 	public static char cadastrarOutroUsuario() {
@@ -195,7 +203,7 @@ public class EcommerceGeneration {
 			opcaoCadastro = leia.next().toUpperCase().charAt(0);
 			
 			if (opcaoCadastro != 'S' && opcaoCadastro != 'N') {
-				System.out.print("Op��o inv�lida. \nDigite S para Cadastrar outra pessoa ou N para ir para o Login: ");
+				System.out.print("Opção inválida. \nDigite S para Cadastrar outra pessoa ou N para ir para o Login: ");
 			} else {
 				return opcaoCadastro;
 			}
@@ -206,26 +214,26 @@ public class EcommerceGeneration {
 
 	public static void logaUsuario(String usuario) {
 		
-		int indiceUsuario;
+		int indice;
 
-		indiceUsuario = procuraCadastro(usuario);
+		indice = procuraCadastro(usuario);
 
-		if (indiceUsuario >= 0) {
+		if (indice >= 0) {
 			
-			if (senhaValida(indiceUsuario, usuario)) {
+			if (senhaValida(indice, usuario)) {
 
 				nomeUsuario = usuario;
-				sexoUsuario = sexoUsuarios[indiceUsuario];
-
+				sexoUsuario = sexoUsuarios[indice];
+				indiceUsuario = indice;
 				System.out.printf("\nSeja Bem-Vinde %s!", nomeUsuario);
 				iniciaCompra();
 			
 			} else {
-				System.out.print("Limite de tentativas alcan�ado. Tente novamente depois! ");
+				System.out.print("Limite de tentativas alcançado. Tente novamente depois! ");
 			}
 		
 		} else {
-			System.out.println("Usu�rio n�o cadastrado. Tente novamente! ");
+			System.out.println("Usuário não cadastrado. Tente novamente! ");
 		}
 		
 	}
@@ -235,8 +243,8 @@ public class EcommerceGeneration {
 		
 		do {
 				
-			System.out.print("\nVoc� tem " + numeroTentativa + " tentativas!\n");
-			System.out.print("\nDigite a senha do usu�rio: " + usuario);
+			System.out.print("\nVocê tem " + numeroTentativa + " tentativas!\n");
+			System.out.print("\nDigite a senha do usuário: " + usuario);
 			System.out.print("\nDigite a sua senha: ");
 			senhaUsuario = leia.next();
 			
@@ -253,15 +261,17 @@ public class EcommerceGeneration {
 
 	public static void iniciaCompra() {
 		
-		//Inicializa carrinho
-		contadorNovoProduto = 0;
-		somaCarrinho = 0;
+		inicializaCarrinho();
 		
+		encontraSugestao();
+
 		int codigoProduto, opcaoCatalogo;
 
 		do {
 			
 			listaProdutos();
+
+			imprimiSugestao();
 			
 			listaCarrinho();
 			
@@ -269,7 +279,7 @@ public class EcommerceGeneration {
 			
 			if (opcaoCatalogo == 1) {
 				
-				System.out.print("\nDigite o c�digo do item que voc� deseja: ");
+				System.out.print("\nDigite o código do item que você deseja: ");
 				codigoProduto = leia.nextInt();
 				
 				if (codigoValido(codigoProduto)) {
@@ -286,7 +296,7 @@ public class EcommerceGeneration {
 			
 			} else if (opcaoCatalogo == 2) {	
 				
-				System.out.print("\nDigite o c�digo do item que voc� deseja remover: ");
+				System.out.print("\nDigite o código do item que você deseja remover: ");
 				codigoProduto = leia.nextInt();
 				
 				if (codigoValido(codigoProduto)) {
@@ -297,7 +307,7 @@ public class EcommerceGeneration {
 			
 			} else if (opcaoCatalogo == 3) {
 
-				System.out.print("\nDigite o c�digo do item que voc� deseja alterar: ");
+				System.out.print("\nDigite o código do item que você deseja alterar: ");
 				codigoProduto = leia.nextInt();
 				
 				if (codigoValido(codigoProduto)) {
@@ -315,34 +325,107 @@ public class EcommerceGeneration {
 				} else {
 					System.out.println("Coloque pelo menos 1 produto no carrinho para finalizar a compra");
 				}
-
 			
 			} else if (opcaoCatalogo == 5) {
 				
-				System.out.println("Deseja mesmo cancelar? S - Sim ou N - N�o : ");
+				System.out.print("Deseja mesmo sair? S - Sim ou N - Não : ");
 				char cancelar = leia.next().toUpperCase().charAt(0);
 				
 				if(cancelar == 'S') {
-					System.out.println("\nVoc� cancelou a compra ");
+					
+					salvaCarrinho();
+					
+					System.out.println("\nVolte sempre!");
 					contadorNovoProduto = 0;
 					break;
 				}
 				
-				
 			} else {
-				System.out.println("Op��o inv�lida! ");
+				System.out.println("Opção inválida! ");
 			}
 		
 		} while (true);
 		
 	}
 
+	public static void encontraSugestao() {
+		
+		int quemComprouTambemComprou[] = new int[QUANTIDADE_PRODUTOS * QUANTIDADE_PRODUTOS];
+		int anulaSugestaoJaComprada[] = new int[QUANTIDADE_PRODUTOS];
+		int indiceCadaUsuario, indiceVetorContagem; 
+		int indice = indiceUsuario * QUANTIDADE_PRODUTOS;
+		
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++, indice++) {
+			
+			if (historicoComprasUsuarios[indice] == 1) {
+				
+				for (int j = 0; j < LIMITE_USUARIOS; j++) {
+				
+					indiceCadaUsuario = j * QUANTIDADE_PRODUTOS;
+					
+					if (historicoComprasUsuarios[indiceCadaUsuario + i] == 1) {
+						
+						indiceVetorContagem = i * QUANTIDADE_PRODUTOS;
+
+						for (int k = 0; k < QUANTIDADE_PRODUTOS; k++, indiceCadaUsuario++, indiceVetorContagem++) {
+							
+							if (historicoComprasUsuarios[indiceCadaUsuario] == 1) {
+								quemComprouTambemComprou[indiceVetorContagem]++;
+							}
+						}
+
+					}
+					
+				}
+
+			} else {
+				anulaSugestaoJaComprada[i] = 1;
+			}
+		}
+
+		sugestaoCompraram = -1;
+		sugestaoTambemCompraram = -1;
+		int indiceProdutoCompraram = -1;
+		int indiceProdutoTambemCompraram = -1;
+		int indiceAuxiliar, maisComprado = 0;
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+			
+			indiceAuxiliar = i * QUANTIDADE_PRODUTOS;
+			for (int j = 0; j < QUANTIDADE_PRODUTOS; j++, indiceAuxiliar++) {
+				
+				quemComprouTambemComprou[indiceAuxiliar] = quemComprouTambemComprou[indiceAuxiliar] * anulaSugestaoJaComprada[j];
+				
+				if (quemComprouTambemComprou[indiceAuxiliar] > maisComprado) {
+					maisComprado = quemComprouTambemComprou[indiceAuxiliar];
+					indiceProdutoCompraram = i;
+					indiceProdutoTambemCompraram = j;
+				}
+			}
+		}
+
+		if (indiceProdutoCompraram != -1) {
+			sugestaoCompraram = indiceProdutoCompraram;
+			sugestaoTambemCompraram = indiceProdutoTambemCompraram;
+		}
+
+	}
+
+	public static void imprimiSugestao() {
+		
+		if (sugestaoCompraram != -1) {
+			System.out.println("\nSUGESTÃO");
+			System.out.printf("Outras pessoas que compraram %s também compraram %s\n", produtos[sugestaoCompraram], produtos[sugestaoTambemCompraram]);
+		}
+	}
+
 	public static void listaProdutos() {
 				
 		System.out.println("\n\nLISTA DE PRODUTOS\n");
 	
-		for (int x = 0; x < QUANTIDADE_PRODUTOS; x++) {
-			System.out.printf("C�digo: %d\t Em estoque: %d\t Valor: R$ %.2f\t %s\n", codigoProdutos[x], estoque[x], valorProdutos[x], produtos[x]);	
+		int aux;
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+			aux = indiceProdutosMaisComprados[i]; 
+			System.out.printf("Código: %d\t Em estoque: %d\t Valor: R$ %.2f\t %s\n", codigoProdutos[aux], estoque[aux], valorProdutos[aux], produtos[aux]);	
 		}
 		
 	}
@@ -352,7 +435,7 @@ public class EcommerceGeneration {
 		System.out.println("\nSTATUS DO CARRINHO");
 			
 		if (contadorNovoProduto == 0) {
-			System.out.println("Seu carrinho est� vazio");
+			System.out.println("Seu carrinho está vazio");
 		} else {
 			somaCarrinho = 0;
 			
@@ -373,7 +456,7 @@ public class EcommerceGeneration {
 		System.out.println("2 - Remover item do carrinho");
 		System.out.println("3 - Editar compra");
 		System.out.println("4 - Finalizar compra");
-		System.out.println("5 - Cancelar compra");
+		System.out.println("5 - Sair da minha conta");
 		System.out.print("Opção: ");
 		
 		return leia.nextInt();
@@ -397,7 +480,7 @@ public class EcommerceGeneration {
 				quantidadeProduto = leia.nextInt();
 
 				if (quantidadeProduto > estoque [codigoProduto - 1]) {
-					System.out.println("Quantidade indispon�vel! Tente novamente");
+					System.out.println("Quantidade indisponível! Tente novamente");
 				} else if (quantidadeProduto <= 0) {
 					System.out.println("Quantidade inválida! Tente novamente");
 				} else {
@@ -422,7 +505,7 @@ public class EcommerceGeneration {
 		int indiceProduto = procuraProduto(codigoProduto);
 		
 		if (indiceProduto == -1) {
-			System.out.println("Este produto n�o consta no seu carrinho");
+			System.out.println("Este produto não consta no seu carrinho");
 		} else {
 			
 			System.out.println("Removendo item...");
@@ -441,7 +524,7 @@ public class EcommerceGeneration {
 		int indiceProduto = procuraProduto(codigoProduto);
 		
 		if (indiceProduto == -1) {
-			System.out.println("O produto n�o est� no seu carrinho");
+			System.out.println("O produto não está no seu carrinho");
 		} else {
 
 			int quantidadeProduto;
@@ -453,7 +536,7 @@ public class EcommerceGeneration {
 				quantidadeProduto= leia.nextInt();
 				
 				if (quantidadeProduto > estoque [codigoProduto - 1]) {
-					System.out.println("Quantidade indispon�vel! Tente novamente");
+					System.out.println("Quantidade indisponível! Tente novamente");
 				} else if (quantidadeProduto <= 0) {
 					System.out.println("Quantidade inválida! Tente novamente");
 				} else {
@@ -491,7 +574,13 @@ public class EcommerceGeneration {
 
 			atualizaEstoque();
 
-			System.out.println("Agradecemos a sua visita! E n�o esque�a: Amigue estou aqui!");
+			atualizaListaMaisComprados();
+
+			atualizaHistoricoComprasUsuario();
+
+			contadorNovoProdutoUsuarios[indiceUsuario] = 0;
+
+			System.out.println("Agradecemos a sua visita! E não esqueça: Amigue estou aqui!");
 			return true;
 		
 		} else if (opcaoFinaliza == 2) {
@@ -500,7 +589,8 @@ public class EcommerceGeneration {
 			return false;
 		} else {
 		
-			System.out.println("Agradecemos a sua visita! E n�o esque�a: Amigue estou aqui!");
+			salvaCarrinho();
+			System.out.println("Agradecemos a sua visita! E não esqueça: Amigue estou aqui!");
 			return true;
 		}
 	}
@@ -510,16 +600,16 @@ public class EcommerceGeneration {
 		
 		do {
 
-			System.out.println("\nEscolha a op��o de pagamento: ");
-			System.out.println("1 - Dinheiro ou D�bito com 10% de desconto");
-			System.out.println("2 - Cr�dito � vista sem juros");
-			System.out.println("3 - Cr�dito em 2 vezes sem juros");
-			System.out.println("4 - Cr�dito em 3 vezes sem juros");
-			System.out.print("Op��o: ");
+			System.out.println("\nEscolha a opção de pagamento: ");
+			System.out.println("1 - Dinheiro ou Débito com 10% de desconto");
+			System.out.println("2 - Crédito à vista sem juros");
+			System.out.println("3 - Crédito em 2 vezes sem juros");
+			System.out.println("4 - Crédito em 3 vezes sem juros");
+			System.out.print("Opção: ");
 			opcaoPagamento = leia.nextInt();
 			
 			if (opcaoPagamento < 1 || opcaoPagamento > 4) {
-				System.out.println("\nVoc� digitou uma op��o inv�lida! Tente novamente!\n");
+				System.out.println("\nVocê digitou uma opção inválida! Tente novamente!\n");
 			} else {
 				break;
 			}
@@ -533,15 +623,15 @@ public class EcommerceGeneration {
 		
 		if (opcaoPagamento == 1) {
 			somaCarrinho = (somaCarrinho * 0.9);
-			System.out.printf("\nO valor total da compra � R$ %.2f", somaCarrinho);
+			System.out.printf("\nO valor total da compra é R$ %.2f", somaCarrinho);
 		} else if (opcaoPagamento == 2) {
-			System.out.printf("\nO valor total da compra � R$ %.2f", somaCarrinho);
+			System.out.printf("\nO valor total da compra é R$ %.2f", somaCarrinho);
 		} else if (opcaoPagamento == 3) {
 			double valorParcela = (somaCarrinho / 2);
-			System.out.printf("\nO valor total da compra � R$ %.2f. E o valor de cada parcela � R$ %.2f", somaCarrinho, valorParcela);
+			System.out.printf("\nO valor total da compra é R$ %.2f. E o valor de cada parcela é R$ %.2f", somaCarrinho, valorParcela);
 		} else {
 			double valorParcela = (somaCarrinho / 3);
-			System.out.printf("\nO valor total da compra � R$ %.2f. E o valor de cada parcela � R$ %.2f", somaCarrinho, valorParcela);
+			System.out.printf("\nO valor total da compra é R$ %.2f. E o valor de cada parcela é R$ %.2f", somaCarrinho, valorParcela);
 		}
 	}
 
@@ -550,15 +640,15 @@ public class EcommerceGeneration {
 
 		do {
 
-			System.out.println("\n\nEscolha uma op��o para continuar: ");
+			System.out.println("\n\nEscolha uma opção para continuar: ");
 			System.out.println("1 - Finalizar a compra");
 			System.out.println("2 - Alterar carrinho");
 			System.out.println("3 - Desistir da compra");
-			System.out.println("Op��o: ");
+			System.out.println("Opção: ");
 			continua = leia.nextInt();
 			
 			if (continua < 1 || continua > 3) {
-				System.out.println("Voc� digitou uma op��o inv�lida! Tente novamente!\n");
+				System.out.println("Você digitou uma opção inválida! Tente novamente!\n");
 			}
 
 		} while (continua < 1 || continua > 3);
@@ -568,19 +658,110 @@ public class EcommerceGeneration {
 
 	public static void imprimiNotaFiscal() {
 
-		System.out.println("\n***** Essa � a nota fiscal da sua compra: *****\n" + "Nome: " + nomeUsuario );
+		System.out.println("\n***** Essa é a nota fiscal da sua compra: *****\n" + "Nome: " + nomeUsuario );
 		for(int i = 0; i < contadorNovoProduto; i++) {
-			System.out.printf("Produtos: %s -  R$ %.2f\n", produtos[carrinhoCodigo[i]-1], valorProdutos[carrinhoCodigo[i]-1]);
+			System.out.printf("Produtos: %s -  R$ %.2f %d\n", produtos[carrinhoCodigo[i]-1], valorProdutos[carrinhoCodigo[i]-1], carrinhoQuantidade[i]);
 		}
 		
 		double valorIcms = somaCarrinho * 0.09;
-		System.out.printf("O valor total da sua compra �: R$%.2f \nO valor do ICSM nessa compra �: R$%.2f \nObrigade pela sua compra! Vamos ao Infinito e Al�m!", somaCarrinho, valorIcms);
+		System.out.printf("O valor total da sua compra é: R$%.2f \nO valor do ICSM nessa compra é: R$%.2f \nObrigade pela sua compra! Vamos ao Infinito e Além!", somaCarrinho, valorIcms);
 	}
 
 	public static void atualizaEstoque() {
 		for(int i = 0; i < contadorNovoProduto; i++) {
 			estoque[carrinhoCodigo[i]-1] = estoque[carrinhoCodigo[i]-1] - carrinhoQuantidade[i];
 		}
+	}
+
+	public static void atualizaListaMaisComprados() {
+		
+		for (int i = 0; i < contadorNovoProduto; i++) {
+			quantidadeProdutosMaisComprados[carrinhoCodigo[i] - 1] += carrinhoQuantidade[i];
+		}
+		
+		int listaAuxiliar[] = new int[QUANTIDADE_PRODUTOS];
+
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+			listaAuxiliar[i] = quantidadeProdutosMaisComprados[i];
+		}
+
+		int indiceMaisVendido;
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+
+			indiceMaisVendido = 0;
+			for (int j = 0; j < QUANTIDADE_PRODUTOS; j++) {
+				if (listaAuxiliar[indiceMaisVendido] < listaAuxiliar[j]) {
+					indiceMaisVendido = j;
+				}
+			}
+			listaAuxiliar[indiceMaisVendido] = -1; //"Excluindo" item do lista para ele não ser mais vendido que zero
+			indiceProdutosMaisComprados[i] = indiceMaisVendido;
+		}
+
+	}
+
+	public static void atualizaHistoricoComprasUsuario() {
+		
+		int indice = indiceUsuario * QUANTIDADE_PRODUTOS;
+		int indiceProduto;
+		for (int i = 0; i < contadorNovoProduto; i++) {
+			indiceProduto = carrinhoCodigo[i] - 1;
+			historicoComprasUsuarios[indice + indiceProduto] = 1;
+		}
+	}
+
+	public static void inicializaCarrinho() {
+		
+		if (contadorNovoProdutoUsuarios[indiceUsuario] > 0) {
+			
+			contadorNovoProduto = contadorNovoProdutoUsuarios[indiceUsuario];
+			
+			int indice = indiceUsuario * QUANTIDADE_PRODUTOS; //Iniciar no carrinho do usuário - Matriz linear
+			for (int i = 0; i < contadorNovoProduto; i++, indice++) {
+
+				if (carrinhoQuantidadeUsuarios[indice] > estoque[carrinhoCodigoUsuarios[indice] - 1]) {
+					
+					carrinhoCodigo[i] = carrinhoCodigoUsuarios[indice];
+					carrinhoQuantidade[i] = estoque[carrinhoCodigoUsuarios[indice] - 1];
+
+				} else {
+					
+					carrinhoCodigo[i] = carrinhoCodigoUsuarios[indice];
+					carrinhoQuantidade[i] = carrinhoQuantidadeUsuarios[indice];
+				}
+			}
+
+			for (int i = 0; i < contadorNovoProduto; i++) {
+				if (carrinhoQuantidade[i] == 0) {
+					removeProduto(carrinhoCodigo[i]);
+				}
+			}
+
+		} else {
+			contadorNovoProduto = 0;
+		}
+	}
+
+	public static void salvaCarrinho() {
+
+		System.out.print("Deseja salvar este carrinho? S - Sim ou N - Não: ");
+		char salvar = leia.next().toUpperCase().charAt(0);
+
+		if (salvar == 'S') {
+
+			contadorNovoProdutoUsuarios[indiceUsuario] = contadorNovoProduto;
+			
+			int indice = indiceUsuario * QUANTIDADE_PRODUTOS; //Iniciar no carrinho do usuário - Matriz linear
+			for (int i = 0; i < contadorNovoProduto; i++, indice++) {
+				carrinhoCodigoUsuarios[indice] = carrinhoCodigo[i];
+				carrinhoQuantidadeUsuarios[indice] = carrinhoQuantidade[i];
+			}
+			
+			System.out.println("Seu carrinho foi salvo");
+		} else {
+			contadorNovoProdutoUsuarios[indiceUsuario] = 0;
+		}
+
 	}
 
 	// Easter Eggs
@@ -677,6 +858,15 @@ public class EcommerceGeneration {
 		System.out.println("                     /    |   |    \\");
 		System.out.println("                    /.---.|   |.---.\\");
 		System.out.println("                    `.____;   :____.'");
+		
+		for (int i = 0; i < 50; i++) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
+			System.out.println();
+		}
 	}
 
 	public static void imprimiAlien() {
