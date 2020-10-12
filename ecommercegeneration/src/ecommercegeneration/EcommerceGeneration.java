@@ -36,6 +36,7 @@ public class EcommerceGeneration {
 	public static String nomeUsuario;
 	public static char sexoUsuario;
 	public static int indiceUsuario;
+	public static int sugestaoCompraram, sugestaoTambemCompraram;
 
 	public static void main(String[] args)throws InterruptedException {
 	
@@ -262,11 +263,15 @@ public class EcommerceGeneration {
 		
 		inicializaCarrinho();
 		
+		encontraSugestao();
+
 		int codigoProduto, opcaoCatalogo;
 
 		do {
 			
 			listaProdutos();
+
+			imprimiSugestao();
 			
 			listaCarrinho();
 			
@@ -320,7 +325,6 @@ public class EcommerceGeneration {
 				} else {
 					System.out.println("Coloque pelo menos 1 produto no carrinho para finalizar a compra");
 				}
-
 			
 			} else if (opcaoCatalogo == 5) {
 				
@@ -336,13 +340,82 @@ public class EcommerceGeneration {
 					break;
 				}
 				
-				
 			} else {
 				System.out.println("Op��o inv�lida! ");
 			}
 		
 		} while (true);
 		
+	}
+
+	public static void encontraSugestao() {
+		
+		int quemComprouTambemComprou[] = new int[QUANTIDADE_PRODUTOS * QUANTIDADE_PRODUTOS];
+		int anulaSugestaoJaComprada[] = new int[QUANTIDADE_PRODUTOS];
+		int indiceCadaUsuario, indiceVetorContagem; 
+		int indice = indiceUsuario * QUANTIDADE_PRODUTOS;
+		
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++, indice++) {
+			
+			if (historicoComprasUsuarios[indice] == 1) {
+				
+				for (int j = 0; j < LIMITE_USUARIOS; j++) {
+				
+					indiceCadaUsuario = j * QUANTIDADE_PRODUTOS;
+					
+					if (historicoComprasUsuarios[indiceCadaUsuario + i] == 1) {
+						
+						indiceVetorContagem = i * QUANTIDADE_PRODUTOS;
+
+						for (int k = 0; k < QUANTIDADE_PRODUTOS; k++, indiceCadaUsuario++, indiceVetorContagem++) {
+							
+							if (historicoComprasUsuarios[indiceCadaUsuario] == 1) {
+								quemComprouTambemComprou[indiceVetorContagem]++;
+							}
+						}
+
+					}
+					
+				}
+
+			} else {
+				anulaSugestaoJaComprada[i] = 1;
+			}
+		}
+
+		sugestaoCompraram = -1;
+		sugestaoTambemCompraram = -1;
+		int indiceProdutoCompraram = -1;
+		int indiceProdutoTambemCompraram = -1;
+		int indiceAuxiliar, maisComprado = 0;
+		for (int i = 0; i < QUANTIDADE_PRODUTOS; i++) {
+			
+			indiceAuxiliar = i * QUANTIDADE_PRODUTOS;
+			for (int j = 0; j < QUANTIDADE_PRODUTOS; j++, indiceAuxiliar++) {
+				
+				quemComprouTambemComprou[indiceAuxiliar] = quemComprouTambemComprou[indiceAuxiliar] * anulaSugestaoJaComprada[j];
+				
+				if (quemComprouTambemComprou[indiceAuxiliar] > maisComprado) {
+					maisComprado = quemComprouTambemComprou[indiceAuxiliar];
+					indiceProdutoCompraram = i;
+					indiceProdutoTambemCompraram = j;
+				}
+			}
+		}
+
+		if (indiceProdutoCompraram != -1) {
+			sugestaoCompraram = indiceProdutoCompraram;
+			sugestaoTambemCompraram = indiceProdutoTambemCompraram;
+		}
+
+	}
+
+	public static void imprimiSugestao() {
+		
+		if (sugestaoCompraram != -1) {
+			System.out.println("\nSUGESTÃO");
+			System.out.printf("Outras pessoas que compraram %s também compraram %s\n", produtos[sugestaoCompraram], produtos[sugestaoTambemCompraram]);
+		}
 	}
 
 	public static void listaProdutos() {
@@ -503,6 +576,8 @@ public class EcommerceGeneration {
 
 			atualizaListaMaisComprados();
 
+			atualizaHistoricoComprasUsuario();
+
 			contadorNovoProdutoUsuarios[indiceUsuario] = 0;
 
 			System.out.println("Agradecemos a sua visita! E n�o esque�a: Amigue estou aqui!");
@@ -623,6 +698,16 @@ public class EcommerceGeneration {
 			indiceProdutosMaisComprados[i] = indiceMaisVendido;
 		}
 
+	}
+
+	public static void atualizaHistoricoComprasUsuario() {
+		
+		int indice = indiceUsuario * QUANTIDADE_PRODUTOS;
+		int indiceProduto;
+		for (int i = 0; i < contadorNovoProduto; i++) {
+			indiceProduto = carrinhoCodigo[i] - 1;
+			historicoComprasUsuarios[indice + indiceProduto] = 1;
+		}
 	}
 
 	public static void inicializaCarrinho() {
@@ -773,6 +858,15 @@ public class EcommerceGeneration {
 		System.out.println("                     /    |   |    \\");
 		System.out.println("                    /.---.|   |.---.\\");
 		System.out.println("                    `.____;   :____.'");
+		
+		for (int i = 0; i < 50; i++) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
+			System.out.println();
+		}
 	}
 
 	public static void imprimiAlien() {
