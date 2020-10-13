@@ -8,7 +8,7 @@ public class EcommerceGeneration {
 	public static Scanner leia = new Scanner(System.in);
 
 	//Catálogo
-	public static String produtos[] = {"Camiseta Woody", "Camiseta Buzz Lightyear", "Camiseta Sid", "Camiseta Betty", "Camiseta Aliens", "Camiseta Andy", "Camiseta Slinky", "Camiseta Rex", "Camiseta Sr. Cabe�a de Batata", "Camiseta Porquinho", "Camiseta Jessie", "Camiseta Ao Infinito e Al�m", "Camiseta Bala no Alvo", "Camiseta Tem Uma Cobra na Minha Bota"};
+	public static String produtos[] = {"Camiseta Woody", "Camiseta Buzz Lightyear", "Camiseta Sid", "Camiseta Betty", "Camiseta Aliens", "Camiseta Andy", "Camiseta Slinky", "Camiseta Rex", "Camiseta Sr. Cabeça de Batata", "Camiseta Porquinho", "Camiseta Jessie", "Camiseta Ao Infinito e Além", "Camiseta Bala no Alvo", "Camiseta Tem Uma Cobra na Minha Bota"};
 	public static int codigoProdutos[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
 	public static double valorProdutos[] = {81, 50, 75, 60, 40, 175, 35, 200, 150, 15, 100, 30, 80, 10};
 	public static int estoque[] = {40, 10, 15, 25, 35, 30, 10, 20, 10, 50, 30, 50, 30, 80};
@@ -80,7 +80,7 @@ public class EcommerceGeneration {
 				Thread.sleep(2000);
 			} else if (opcaoEntrada == 2) {
 
-				System.out.print("Digite seu nome de usu�rio: ");
+				System.out.print("Digite seu nome de usuário: ");
 				nomeUsuario = leia.next();
 				
 				logaUsuario(nomeUsuario);
@@ -235,6 +235,12 @@ public class EcommerceGeneration {
 		} else {
 			System.out.println("Usuário não cadastrado. Tente novamente! ");
 		}
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+		}
+		System.out.println();
 		
 	}
 	
@@ -343,7 +349,11 @@ public class EcommerceGeneration {
 			} else {
 				System.out.println("Opção inválida! ");
 			}
-		
+		try {
+				Thread.sleep(3500);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
 		} while (true);
 		
 	}
@@ -556,7 +566,7 @@ public class EcommerceGeneration {
 				return x;
 			}
 		}
-
+	
 		return -1;
 	}
 
@@ -590,7 +600,12 @@ public class EcommerceGeneration {
 		} else {
 		
 			salvaCarrinho();
-			System.out.println("Agradecemos a sua visita! E não esqueça: Amigue estou aqui!");
+			System.out.println("\nAgradecemos a sua visita! E não esqueça: Amigue estou aqui!");
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
 			return true;
 		}
 	}
@@ -665,6 +680,11 @@ public class EcommerceGeneration {
 		
 		double valorIcms = somaCarrinho * 0.09;
 		System.out.printf("O valor total da sua compra é: R$%.2f \nO valor do ICSM nessa compra é: R$%.2f \nObrigade pela sua compra! Vamos ao Infinito e Além!", somaCarrinho, valorIcms);
+		try {
+				Thread.sleep(2000);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
 	}
 
 	public static void atualizaEstoque() {
